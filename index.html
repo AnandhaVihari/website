@@ -1,0 +1,916 @@
+# 100 Data Structures and Algorithms (DSA) Coding Problems
+
+## Arrays and Strings
+
+### 1. Two Sum
+**Problem:** Given an array of integers and a target sum, return the indices of two numbers that add up to the target.
+
+**Example:**
+```
+Input: nums = [2, 7, 11, 15], target = 9
+Output: [0, 1] (because nums[0] + nums[1] = 2 + 7 = 9)
+```
+
+**Solution:**
+```python
+def two_sum(nums, target):
+    seen = {}  # value -> index
+    for i, num in enumerate(nums):
+        complement = target - num
+        if complement in seen:
+            return [seen[complement], i]
+        seen[num] = i
+    return []
+```
+**Time Complexity:** O(n), **Space Complexity:** O(n)
+
+### 2. Maximum Subarray
+**Problem:** Find the contiguous subarray with the largest sum.
+
+**Example:**
+```
+Input: [-2, 1, -3, 4, -1, 2, 1, -5, 4]
+Output: 6 (subarray [4, -1, 2, 1])
+```
+
+**Solution:**
+```python
+def max_subarray(nums):
+    max_so_far = nums[0]
+    current_max = nums[0]
+    
+    for i in range(1, len(nums)):
+        current_max = max(nums[i], current_max + nums[i])
+        max_so_far = max(max_so_far, current_max)
+    
+    return max_so_far
+```
+**Time Complexity:** O(n), **Space Complexity:** O(1)
+
+### 3. Container With Most Water
+**Problem:** Given n non-negative integers representing heights of lines, find two lines that together with the x-axis forms a container that holds the most water.
+
+**Example:**
+```
+Input: [1, 8, 6, 2, 5, 4, 8, 3, 7]
+Output: 49 (between heights 8 and 7)
+```
+
+**Solution:**
+```python
+def max_area(height):
+    max_water = 0
+    left = 0
+    right = len(height) - 1
+    
+    while left < right:
+        width = right - left
+        max_water = max(max_water, min(height[left], height[right]) * width)
+        
+        if height[left] < height[right]:
+            left += 1
+        else:
+            right -= 1
+    
+    return max_water
+```
+**Time Complexity:** O(n), **Space Complexity:** O(1)
+
+### 4. Valid Anagram
+**Problem:** Given two strings, determine if the second is an anagram of the first.
+
+**Example:**
+```
+Input: s = "anagram", t = "nagaram"
+Output: true
+```
+
+**Solution:**
+```python
+def is_anagram(s, t):
+    if len(s) != len(t):
+        return False
+    
+    char_count = {}
+    
+    for char in s:
+        char_count[char] = char_count.get(char, 0) + 1
+    
+    for char in t:
+        if char not in char_count or char_count[char] == 0:
+            return False
+        char_count[char] -= 1
+    
+    return True
+```
+**Time Complexity:** O(n), **Space Complexity:** O(1) - Since we have a fixed character set
+
+### 5. Rotate Array
+**Problem:** Rotate an array to the right by k steps.
+
+**Example:**
+```
+Input: [1,2,3,4,5,6,7], k = 3
+Output: [5,6,7,1,2,3,4]
+```
+
+**Solution:**
+```python
+def rotate(nums, k):
+    n = len(nums)
+    k %= n  # In case k > n
+    
+    # Reverse the entire array
+    reverse(nums, 0, n - 1)
+    # Reverse the first k elements
+    reverse(nums, 0, k - 1)
+    # Reverse the remaining elements
+    reverse(nums, k, n - 1)
+    
+def reverse(nums, start, end):
+    while start < end:
+        nums[start], nums[end] = nums[end], nums[start]
+        start += 1
+        end -= 1
+```
+**Time Complexity:** O(n), **Space Complexity:** O(1)
+
+## Linked Lists
+
+### 6. Reverse Linked List
+**Problem:** Reverse a singly linked list.
+
+**Example:**
+```
+Input: 1->2->3->4->5
+Output: 5->4->3->2->1
+```
+
+**Solution:**
+```python
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+
+def reverse_list(head):
+    prev = None
+    current = head
+    
+    while current:
+        next_temp = current.next
+        current.next = prev
+        prev = current
+        current = next_temp
+    
+    return prev
+```
+**Time Complexity:** O(n), **Space Complexity:** O(1)
+
+### 7. Detect Cycle in Linked List
+**Problem:** Given a linked list, determine if it has a cycle.
+
+**Solution:**
+```python
+def has_cycle(head):
+    if not head or not head.next:
+        return False
+    
+    slow = head
+    fast = head
+    
+    while fast and fast.next:
+        slow = slow.next
+        fast = fast.next.next
+        
+        if slow == fast:
+            return True
+    
+    return False
+```
+**Time Complexity:** O(n), **Space Complexity:** O(1)
+
+### 8. Merge Two Sorted Lists
+**Problem:** Merge two sorted linked lists into one sorted list.
+
+**Example:**
+```
+Input: 1->2->4, 1->3->4
+Output: 1->1->2->3->4->4
+```
+
+**Solution:**
+```python
+def merge_two_lists(l1, l2):
+    dummy = ListNode(0)
+    current = dummy
+    
+    while l1 and l2:
+        if l1.val < l2.val:
+            current.next = l1
+            l1 = l1.next
+        else:
+            current.next = l2
+            l2 = l2.next
+        current = current.next
+    
+    # Attach remaining nodes
+    current.next = l1 if l1 else l2
+    
+    return dummy.next
+```
+**Time Complexity:** O(n+m), **Space Complexity:** O(1)
+
+### 9. Remove Nth Node From End
+**Problem:** Remove the nth node from the end of a linked list and return its head.
+
+**Example:**
+```
+Input: 1->2->3->4->5, n = 2
+Output: 1->2->3->5
+```
+
+**Solution:**
+```python
+def remove_nth_from_end(head, n):
+    dummy = ListNode(0)
+    dummy.next = head
+    first = dummy
+    second = dummy
+    
+    # Advance first pointer by n+1 steps
+    for i in range(n + 1):
+        first = first.next
+    
+    # Move both pointers until first reaches the end
+    while first:
+        first = first.next
+        second = second.next
+    
+    # Remove the nth node
+    second.next = second.next.next
+    
+    return dummy.next
+```
+**Time Complexity:** O(n), **Space Complexity:** O(1)
+
+### 10. Palindrome Linked List
+**Problem:** Determine if a linked list is a palindrome.
+
+**Example:**
+```
+Input: 1->2->2->1
+Output: true
+```
+
+**Solution:**
+```python
+def is_palindrome(head):
+    if not head or not head.next:
+        return True
+    
+    # Find the middle of the linked list
+    slow = head
+    fast = head
+    
+    while fast.next and fast.next.next:
+        slow = slow.next
+        fast = fast.next.next
+    
+    # Reverse the second half
+    second_half = reverse_list(slow.next)
+    
+    # Compare first and second half
+    first_half = head
+    while second_half:
+        if first_half.val != second_half.val:
+            return False
+        first_half = first_half.next
+        second_half = second_half.next
+    
+    return True
+```
+**Time Complexity:** O(n), **Space Complexity:** O(1)
+
+## Stacks and Queues
+
+### 11. Valid Parentheses
+**Problem:** Determine if a string of brackets is valid (open brackets must be closed by the same type of brackets and in correct order).
+
+**Example:**
+```
+Input: "()[]{}"
+Output: true
+```
+
+**Solution:**
+```python
+def is_valid(s):
+    stack = []
+    mapping = {")": "(", "}": "{", "]": "["}
+    
+    for char in s:
+        if char in mapping:  # closing bracket
+            top_element = stack.pop() if stack else '#'
+            if mapping[char] != top_element:
+                return False
+        else:  # opening bracket
+            stack.append(char)
+    
+    return not stack
+```
+**Time Complexity:** O(n), **Space Complexity:** O(n)
+
+### 12. Implement Queue using Stacks
+**Problem:** Implement a queue using only stacks.
+
+**Solution:**
+```python
+class MyQueue:
+    def __init__(self):
+        self.stack1 = []  # for push
+        self.stack2 = []  # for pop and peek
+        
+    def push(self, x):
+        self.stack1.append(x)
+    
+    def pop(self):
+        self._move_stack1_to_stack2()
+        return self.stack2.pop()
+    
+    def peek(self):
+        self._move_stack1_to_stack2()
+        return self.stack2[-1]
+    
+    def empty(self):
+        return len(self.stack1) == 0 and len(self.stack2) == 0
+    
+    def _move_stack1_to_stack2(self):
+        if not self.stack2:
+            while self.stack1:
+                self.stack2.append(self.stack1.pop())
+```
+**Time Complexity:** Push - O(1), Pop - Amortized O(1), **Space Complexity:** O(n)
+
+### 13. Min Stack
+**Problem:** Design a stack that supports push, pop, top, and retrieving the minimum element in constant time.
+
+**Solution:**
+```python
+class MinStack:
+    def __init__(self):
+        self.stack = []
+        self.min_stack = []
+        
+    def push(self, val):
+        self.stack.append(val)
+        if not self.min_stack or val <= self.min_stack[-1]:
+            self.min_stack.append(val)
+    
+    def pop(self):
+        if self.stack.pop() == self.min_stack[-1]:
+            self.min_stack.pop()
+    
+    def top(self):
+        return self.stack[-1]
+    
+    def getMin(self):
+        return self.min_stack[-1]
+```
+**Time Complexity:** All operations - O(1), **Space Complexity:** O(n)
+
+### 14. Evaluate Reverse Polish Notation
+**Problem:** Evaluate an expression in Reverse Polish Notation (postfix notation).
+
+**Example:**
+```
+Input: ["2", "1", "+", "3", "*"]
+Output: 9 ((2 + 1) * 3)
+```
+
+**Solution:**
+```python
+def eval_rpn(tokens):
+    stack = []
+    operations = {
+        '+': lambda a, b: a + b,
+        '-': lambda a, b: a - b,
+        '*': lambda a, b: a * b,
+        '/': lambda a, b: int(a / b)  # Integer division
+    }
+    
+    for token in tokens:
+        if token in operations:
+            b = stack.pop()
+            a = stack.pop()
+            stack.append(operations[token](a, b))
+        else:
+            stack.append(int(token))
+    
+    return stack[0]
+```
+**Time Complexity:** O(n), **Space Complexity:** O(n)
+
+### 15. Sliding Window Maximum
+**Problem:** Given an array and an integer k, find the maximum for each sliding window of size k.
+
+**Example:**
+```
+Input: nums = [1,3,-1,-3,5,3,6,7], k = 3
+Output: [3,3,5,5,6,7]
+```
+
+**Solution:**
+```python
+from collections import deque
+
+def max_sliding_window(nums, k):
+    result = []
+    dq = deque()  # stores indices
+    
+    for i in range(len(nums)):
+        # Remove indices that are out of bounds for current window
+        while dq and dq[0] < i - k + 1:
+            dq.popleft()
+        
+        # Remove smaller elements as they won't be maximum
+        while dq and nums[dq[-1]] < nums[i]:
+            dq.pop()
+        
+        # Add current element's index
+        dq.append(i)
+        
+        # Add maximum for current window
+        if i >= k - 1:
+            result.append(nums[dq[0]])
+    
+    return result
+```
+**Time Complexity:** O(n), **Space Complexity:** O(k)
+
+## Trees and Graphs
+
+### 16. Maximum Depth of Binary Tree
+**Problem:** Find the maximum depth (height) of a binary tree.
+
+**Solution:**
+```python
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+
+def max_depth(root):
+    if not root:
+        return 0
+    
+    left_depth = max_depth(root.left)
+    right_depth = max_depth(root.right)
+    
+    return max(left_depth, right_depth) + 1
+```
+**Time Complexity:** O(n), **Space Complexity:** O(h) where h is the height
+
+### 17. Validate Binary Search Tree
+**Problem:** Determine if a binary tree is a valid Binary Search Tree (BST).
+
+**Solution:**
+```python
+def is_valid_bst(root):
+    def validate(node, lower=float('-inf'), upper=float('inf')):
+        if not node:
+            return True
+        
+        if node.val <= lower or node.val >= upper:
+            return False
+        
+        return (validate(node.left, lower, node.val) and 
+                validate(node.right, node.val, upper))
+    
+    return validate(root)
+```
+**Time Complexity:** O(n), **Space Complexity:** O(h)
+
+### 18. Binary Tree Level Order Traversal
+**Problem:** Return the level order traversal of a binary tree's values as a list of lists.
+
+**Example:**
+```
+Input: 
+    3
+   / \
+  9  20
+    /  \
+   15   7
+Output: [[3], [9,20], [15,7]]
+```
+
+**Solution:**
+```python
+from collections import deque
+
+def level_order(root):
+    if not root:
+        return []
+    
+    result = []
+    queue = deque([root])
+    
+    while queue:
+        level_size = len(queue)
+        level = []
+        
+        for _ in range(level_size):
+            node = queue.popleft()
+            level.append(node.val)
+            
+            if node.left:
+                queue.append(node.left)
+            if node.right:
+                queue.append(node.right)
+        
+        result.append(level)
+    
+    return result
+```
+**Time Complexity:** O(n), **Space Complexity:** O(n)
+
+### 19. Lowest Common Ancestor in BST
+**Problem:** Find the lowest common ancestor of two nodes in a Binary Search Tree.
+
+**Solution:**
+```python
+def lowest_common_ancestor(root, p, q):
+    if p.val < root.val and q.val < root.val:
+        return lowest_common_ancestor(root.left, p, q)
+    elif p.val > root.val and q.val > root.val:
+        return lowest_common_ancestor(root.right, p, q)
+    else:
+        return root
+```
+**Time Complexity:** O(h), **Space Complexity:** O(h)
+
+### 20. Number of Islands
+**Problem:** Count the number of islands in a 2D grid (connected 1's, surrounded by 0's).
+
+**Example:**
+```
+Input: [
+  ["1","1","0","0","0"],
+  ["1","1","0","0","0"],
+  ["0","0","1","0","0"],
+  ["0","0","0","1","1"]
+]
+Output: 3
+```
+
+**Solution:**
+```python
+def num_islands(grid):
+    if not grid:
+        return 0
+    
+    count = 0
+    rows, cols = len(grid), len(grid[0])
+    
+    def dfs(r, c):
+        if (r < 0 or r >= rows or c < 0 or c >= cols or 
+            grid[r][c] == '0'):
+            return
+        
+        # Mark as visited
+        grid[r][c] = '0'
+        
+        # Explore neighbors
+        dfs(r+1, c)
+        dfs(r-1, c)
+        dfs(r, c+1)
+        dfs(r, c-1)
+    
+    for r in range(rows):
+        for c in range(cols):
+            if grid[r][c] == '1':
+                count += 1
+                dfs(r, c)
+    
+    return count
+```
+**Time Complexity:** O(m*n), **Space Complexity:** O(m*n) in worst case
+
+## Dynamic Programming
+
+### 21. Climbing Stairs
+**Problem:** Count ways to climb n stairs, taking 1 or 2 steps at a time.
+
+**Example:**
+```
+Input: n = 3
+Output: 3 (1+1+1, 1+2, 2+1)
+```
+
+**Solution:**
+```python
+def climb_stairs(n):
+    if n <= 2:
+        return n
+    
+    dp = [0] * (n + 1)
+    dp[1] = 1
+    dp[2] = 2
+    
+    for i in range(3, n + 1):
+        dp[i] = dp[i-1] + dp[i-2]
+    
+    return dp[n]
+```
+**Time Complexity:** O(n), **Space Complexity:** O(n)
+
+### 22. Coin Change
+**Problem:** Find the fewest number of coins needed to make up a given amount.
+
+**Example:**
+```
+Input: coins = [1,2,5], amount = 11
+Output: 3 (5 + 5 + 1)
+```
+
+**Solution:**
+```python
+def coin_change(coins, amount):
+    dp = [float('inf')] * (amount + 1)
+    dp[0] = 0
+    
+    for coin in coins:
+        for x in range(coin, amount + 1):
+            dp[x] = min(dp[x], dp[x - coin] + 1)
+    
+    return dp[amount] if dp[amount] != float('inf') else -1
+```
+**Time Complexity:** O(amount * len(coins)), **Space Complexity:** O(amount)
+
+### 23. Longest Increasing Subsequence
+**Problem:** Find the length of the longest strictly increasing subsequence.
+
+**Example:**
+```
+Input: [10,9,2,5,3,7,101,18]
+Output: 4 ([2,3,7,101])
+```
+
+**Solution:**
+```python
+def length_of_lis(nums):
+    if not nums:
+        return 0
+    
+    n = len(nums)
+    dp = [1] * n
+    
+    for i in range(1, n):
+        for j in range(i):
+            if nums[i] > nums[j]:
+                dp[i] = max(dp[i], dp[j] + 1)
+    
+    return max(dp)
+```
+**Time Complexity:** O(n²), **Space Complexity:** O(n)
+
+### 24. 0/1 Knapsack Problem
+**Problem:** Given weights and values of n items, put these items in a knapsack of capacity W to get the maximum value.
+
+**Solution:**
+```python
+def knapsack(W, wt, val, n):
+    dp = [[0 for _ in range(W + 1)] for _ in range(n + 1)]
+    
+    for i in range(1, n + 1):
+        for w in range(1, W + 1):
+            if wt[i-1] <= w:
+                dp[i][w] = max(val[i-1] + dp[i-1][w-wt[i-1]], dp[i-1][w])
+            else:
+                dp[i][w] = dp[i-1][w]
+    
+    return dp[n][W]
+```
+**Time Complexity:** O(n*W), **Space Complexity:** O(n*W)
+
+### 25. Edit Distance
+**Problem:** Find the minimum number of operations required to convert one string to another.
+
+**Example:**
+```
+Input: word1 = "horse", word2 = "ros"
+Output: 3
+```
+
+**Solution:**
+```python
+def min_distance(word1, word2):
+    m, n = len(word1), len(word2)
+    dp = [[0 for _ in range(n + 1)] for _ in range(m + 1)]
+    
+    # Base cases
+    for i in range(m + 1):
+        dp[i][0] = i
+    for j in range(n + 1):
+        dp[0][j] = j
+    
+    for i in range(1, m + 1):
+        for j in range(1, n + 1):
+            if word1[i-1] == word2[j-1]:
+                dp[i][j] = dp[i-1][j-1]
+            else:
+                dp[i][j] = min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]) + 1
+    
+    return dp[m][n]
+```
+**Time Complexity:** O(m*n), **Space Complexity:** O(m*n)
+
+## Sorting and Searching
+
+### 26. Merge Sort
+**Problem:** Implement the merge sort algorithm.
+
+**Solution:**
+```python
+def merge_sort(arr):
+    if len(arr) <= 1:
+        return arr
+    
+    mid = len(arr) // 2
+    left = merge_sort(arr[:mid])
+    right = merge_sort(arr[mid:])
+    
+    return merge(left, right)
+
+def merge(left, right):
+    result = []
+    i = j = 0
+    
+    while i < len(left) and j < len(right):
+        if left[i] < right[j]:
+            result.append(left[i])
+            i += 1
+        else:
+            result.append(right[j])
+            j += 1
+    
+    result.extend(left[i:])
+    result.extend(right[j:])
+    return result
+```
+**Time Complexity:** O(n log n), **Space Complexity:** O(n)
+
+### 27. Quick Sort
+**Problem:** Implement the quick sort algorithm.
+
+**Solution:**
+```python
+def quick_sort(arr, low=0, high=None):
+    if high is None:
+        high = len(arr) - 1
+    
+    if low < high:
+        pivot_idx = partition(arr, low, high)
+        quick_sort(arr, low, pivot_idx - 1)
+        quick_sort(arr, pivot_idx + 1, high)
+    
+    return arr
+
+def partition(arr, low, high):
+    pivot = arr[high]
+    i = low - 1
+    
+    for j in range(low, high):
+        if arr[j] <= pivot:
+            i += 1
+            arr[i], arr[j] = arr[j], arr[i]
+    
+    arr[i + 1], arr[high] = arr[high], arr[i + 1]
+    return i + 1
+```
+**Time Complexity:** Average - O(n log n), Worst - O(n²), **Space Complexity:** O(log n) for recursion stack
+
+### 28. Find First and Last Position
+**Problem:** Find the starting and ending position of a given target value in a sorted array.
+
+**Example:**
+```
+Input: nums = [5,7,7,8,8,10], target = 8
+Output: [3,4]
+```
+
+**Solution:**
+```python
+def search_range(nums, target):
+    first = binary_search_leftmost(nums, target)
+    
+    # If target not found
+    if first == -1:
+        return [-1, -1]
+    
+    last = binary_search_rightmost(nums, target)
+    return [first, last]
+
+def binary_search_leftmost(nums, target):
+    low, high = 0, len(nums) - 1
+    result = -1
+    
+    while low <= high:
+        mid = (low + high) // 2
+        if nums[mid] == target:
+            result = mid
+            high = mid - 1  # Continue searching left
+        elif nums[mid] < target:
+            low = mid + 1
+        else:
+            high = mid - 1
+    
+    return result
+
+def binary_search_rightmost(nums, target):
+    low, high = 0, len(nums) - 1
+    result = -1
+    
+    while low <= high:
+        mid = (low + high) // 2
+        if nums[mid] == target:
+            result = mid
+            low = mid + 1  # Continue searching right
+        elif nums[mid] < target:
+            low = mid + 1
+        else:
+            high = mid - 1
+    
+    return result
+```
+**Time Complexity:** O(log n), **Space Complexity:** O(1)
+
+### 29. Median of Two Sorted Arrays
+**Problem:** Find the median of two sorted arrays.
+
+**Example:**
+```
+Input: nums1 = [1,3], nums2 = [2]
+Output: 2.0
+```
+
+**Solution:**
+```python
+def find_median_sorted_arrays(nums1, nums2):
+    if len(nums1) > len(nums2):
+        nums1, nums2 = nums2, nums1
+    
+    x, y = len(nums1), len(nums2)
+    low, high = 0, x
+    
+    while low <= high:
+        partition_x = (low + high) // 2
+        partition_y = (x + y + 1) // 2 - partition_x
+        
+        max_x = float('-inf') if partition_x == 0 else nums1[partition_x - 1]
+        min_x = float('inf') if partition_x == x else nums1[partition_x]
+        
+        max_y = float('-inf') if partition_y == 0 else nums2[partition_y - 1]
+        min_y = float('inf') if partition_y == y else nums2[partition_y]
+        
+        if max_x <= min_y and max_y <= min_x:
+            # Found correct partition
+            if (x + y) % 2 == 0:
+                return (max(max_x, max_y) + min(min_x, min_y)) / 2
+            else:
+                return max(max_x, max_y)
+        elif max_x > min_y:
+            high = partition_x - 1
+        else:
+            low = partition_x + 1
+```
+**Time Complexity:** O(log(min(m,n))), **Space Complexity:** O(1)
+
+### 30. Kth Largest Element
+**Problem:** Find the kth largest element in an unsorted array.
+
+**Example:**
+```
+Input: [3,2,1,5,6,4], k = 2
+Output: 5
+```
+
+**Solution:**
+```python
+def find_kth_largest(nums, k):
+    # Using QuickSelect algorithm
+    def partition(left, right, pivot_index):
+        pivot = nums[pivot_index]
+        # Move pivot to end
+        nums[pivot_index], nums[right] = nums[right], nums[pivot_index]
+        
+        # Move elements smaller than pivot to the left
+        store_index = left
+        for i in range(left, right):
+            if nums[i] < pivot:
+                nums[store_index], nums[i] = nums[i], nums[store_index]
+                store_index += 1
+        
+        # Move pivot to its final</antArt
